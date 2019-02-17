@@ -1,4 +1,4 @@
-import { writeConfigFile, toAbsolute, BitcoinConfig } from '@carnesen/bitcoin-config';
+import { toAbsolute, BitcoinConfig, updateConfigFile } from '@carnesen/bitcoin-config';
 import { installSoftware } from '@carnesen/bitcoin-software';
 import {
   startService,
@@ -7,11 +7,8 @@ import {
   isServiceRunning,
 } from '@carnesen/bitcoin-service';
 import { URL } from 'url';
-import { runAndExit } from '@carnesen/run-and-exit';
 
-export type BitcoinRegtestServiceOptions = Pick<BitcoinConfig, 'datadir'>;
-
-const config: Required<
+const DEFAULT_CONFIG: Required<
   Pick<BitcoinConfig, 'rpcuser' | 'rpcpassword' | 'port' | 'rpcport'>
 > = {
   rpcuser: 'rpcuser',
@@ -20,9 +17,11 @@ const config: Required<
   rpcport: 48332,
 };
 
-export class BitcoinRegtestService {
-  private readonly options: BitcoinRegtestServiceOptions;
-  constructor(options: BitcoinRegtestServiceOptions = {}) {
+export type RegtestServiceOptions = Pick<BitcoinConfig, 'datadir'>;
+
+export class RegtestService {
+  private readonly options: RegtestServiceOptions;
+  constructor(options: RegtestServiceOptions = {}) {
     this.options = options;
   }
 
@@ -36,32 +35,28 @@ export class BitcoinRegtestService {
 
   public get rpcHref() {
     const url = new URL('http://localhost');
-    url.username = config.rpcuser;
-    url.password = config.rpcpassword;
-    url.port = config.rpcport.toString();
+    url.username = DEFAULT_CONFIG.rpcuser;
+    url.password = DEFAULT_CONFIG.rpcpassword;
+    url.port = DEFAULT_CONFIG.rpcport.toString();
     return url.href;
   }
 
-  public install() {
-    writeConfigFile(this.configFilePath, {
+  public async start() {
+    const { changed: changed0 } = updateConfigFile(this.configFilePath, {
       datadir: this.options.datadir,
       regtest: true,
       sections: {
-        regtest: config,
+        regtest: DEFAULT_CONFIG,
       },
     });
-    return installSoftware(this.bitcoinHome);
-  }
-
-  public installAndExit() {
-    runAndExit(async () => {
-      await this.install();
-      return 'Installed bitcoin dev service';
-    });
-  }
-
-  public start() {
-    return startService(this.configFilePath, this.bitcoinHome);
+    const { changed: changed1 } = await installSoftware(this.bitcoinHome);
+    const { changed: changed2 } = await startService(
+      this.configFilePath,
+      this.bitcoinHome,
+    );
+    return {
+      changed: changed0 || changed1 || changed2,
+    };
   }
 
   public stop() {

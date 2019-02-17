@@ -1,6 +1,12 @@
-import { devService as subject } from '../example';
+import { resolve } from 'path';
 
-describe(subject.constructor.name, () => {
+import { RegtestService } from '..';
+
+const subject = new RegtestService({
+  datadir: resolve(__dirname, '..', '..', 'tmp'),
+});
+
+describe(RegtestService.name, () => {
   it('starts, stops, and restarts', async () => {
     await subject.stop();
     expect(await subject.isRunning()).toBe(false);
@@ -10,11 +16,7 @@ describe(subject.constructor.name, () => {
     expect(await subject.isRunning()).toBe(true);
     await subject.stop();
     expect(await subject.isRunning()).toBe(false);
-  });
-
-  it('installs', async () => {
-    await subject.install();
-  });
+  }, 30000);
 
   it('has getter rpcHref', () => {
     expect(subject.rpcHref).toMatch(/^http/);
