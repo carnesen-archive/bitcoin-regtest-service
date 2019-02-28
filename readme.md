@@ -54,6 +54,7 @@ Returns a promise that resolves to `true` if the service is running or `false` i
 Check out [the tests directory](src/__tests__) for more examples of how to use this library. If you encounter any bugs or have any questions or feature requests, please don't hesitate to [file an issue](https://github.com/carnesen/bitcoin-regtest-service/issues/new) or [submit a pull request](https://github.com/carnesen/bitcoin-regtest-service/compare) on [this project's repository on GitHub](https://github.com/carnesen/bitcoin-regtest-service).
 
 ## Related
+- [@carnesen/bitcoin-regtest-service-cli](https://github.com/carnesen/bitcoin-regtest-service-cli): A Node.js command-line interface for managing a regtest-mode `bitcoind` service
 - [@carnesen/bitcoin-config](https://github.com/carnesen/bitcoin-config): A Node.js library for bitcoin server software configuration
 - [@carnesen/bitcoin-service](https://github.com/carnesen/bitcoin-service): A Node.js library for managing the bitcoin service `bitcoind`
 - [@carnesen/bitcoin-software](https://github.com/carnesen/bitcoin-software): A Node.js library for installing bitcoin server software
